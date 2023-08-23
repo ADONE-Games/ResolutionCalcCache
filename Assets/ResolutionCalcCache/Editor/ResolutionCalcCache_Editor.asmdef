@@ -1,0 +1,16 @@
+{
+    "name": "ResolutionCalcCache_Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:395043984bcb042b5933ffa07d9689cd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
