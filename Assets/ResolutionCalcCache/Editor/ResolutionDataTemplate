@@ -6,15 +6,14 @@ using ADONEGames.ResolutionCalcCache;
 
 namespace #NAMESPACE#
 {
-    /// <summary>
-    /// Serializable resolution data
-    /// </summary>
+    /// <inheritdoc cref="IResolutionData"/>
     public struct #CLASS# : IResolutionData
     {
-        /// <inheritdoc /> 
-        int IResolutionData.Width => #WIDTH#;
+        readonly IResolutionSizeData[] IResolutionData.ResolutionSizeDatas => new IResolutionSizeData[] { #SIZEDATA# };
 
         /// <inheritdoc />
-        int IResolutionData.Height => #HEIGHT#;
+        readonly FitDirection IResolutionData.FitDirection => FitDirection.#FitDirection#;
+
+#SIZEDATACLASS#
     }
 }
