@@ -5,10 +5,10 @@
 namespace #NAMESPACE#
 {
     /// <summary>
-    /// Resolution level enumeration.
+    /// Resolution level enumeration
     /// </summary>
     /// <remarks>
-    /// 解像度レベルの列挙型です。
+    /// 解像度レベルの列挙型
     /// </remarks>
     public enum ResolutionLevel : uint
     {

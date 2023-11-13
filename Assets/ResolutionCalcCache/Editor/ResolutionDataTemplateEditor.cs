@@ -12,25 +12,30 @@ namespace ADONEGames.ResolutionCalcCache.Editor
     /// </summary>
     internal readonly struct ResolutionDataTemplateEditor
     {
-        private const string ResolutionCalcCacheKeyword = "ResolutionCalcCache";
-        private const string ResolutionDataTemplateKeyword = "ResolutionDataTemplate";
-        private const string ResolutionSizeDataTemplateKeyword = "ResolutionSizeDataTemplate";
-        private const string ResolutionLevelTemplateKeyword = "ResolutionLevelTemplate";
-        private const string ResolutionCategoryTemplateKeyword = "ResolutionCategoryTemplate";
-        private const string ResolutionSetupTemplateKeyword = "ResolutionSetupTemplate";
+        private const string ResolutionCalcCacheKeyword              = "ResolutionCalcCache";
+        private const string ResolutionDataTemplateKeyword           = "ResolutionDataTemplate";
+        private const string ResolutionSizeDataTemplateKeyword       = "ResolutionSizeDataTemplate";
+        private const string ResolutionLevelTemplateKeyword          = "ResolutionLevelTemplate";
+        private const string ResolutionCategoryTemplateKeyword       = "ResolutionCategoryTemplate";
+        private const string ResolutionDataProcAppendTemplateKeyword = "ResolutionDataProcAppendTemplate";
+        private const string ResolutionSetupTemplateKeyword          = "ResolutionSetupTemplate";
 
         private const string NamespaceKeyword     = "#NAMESPACE#";
         private const string ClassKeyword         = "#CLASS#";
+        private const string DataClassKeyword     = "#DATACLASS#";
         private const string SizeDataKeyword      = "#SIZEDATA#";
         private const string SizeDataClassKeyword = "#SIZEDATACLASS#";
         private const string WidthKeyword         = "#WIDTH#";
         private const string HeightKeyword        = "#HEIGHT#";
         private const string AspectKeyword        = "#ASPCT#";
-        private const string OrientationKeyword   = "#Orientation#";
+        private const string DepthKeyword         = "#DEPTH#";
+        private const string TextureFormatKeyword = "#TEXTUREFORMAT#";
+        private const string OrientationKeyword   = "#ORIENTATION#";
         private const string FitDirectionKeyword  = "#FitDirection#";
         private const string LevelsKeyword        = "#LEVELS#";
         private const string CategoryKeyword      = "#CATEGORY#";
         private const string AppendKeyword        = "#APPEND#";
+        private const string LevelKeyword         = "#LEVEL#";
 
         private readonly ResolutionProjectDataEditor _projectData;
         private readonly string _dataPath;
@@ -38,6 +43,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
         private readonly string _resolutionSizeDataTemplatePath;
         private readonly string _resolutionLevelTemplatePath;
         private readonly string _resolutionCategoryTemplatePath;
+        private readonly string _resolutionDataProcAppendTemplatePath;
         private readonly string _resolutionSetupTemplatePath;
 
         /// <summary>
@@ -54,6 +60,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             _resolutionSizeDataTemplatePath = paths.FirstOrDefault( path => path.Contains( ResolutionSizeDataTemplateKeyword ) );
             _resolutionLevelTemplatePath = paths.FirstOrDefault( path => path.Contains( ResolutionLevelTemplateKeyword ) );
             _resolutionCategoryTemplatePath = paths.FirstOrDefault( path => path.Contains( ResolutionCategoryTemplateKeyword ) );
+            _resolutionDataProcAppendTemplatePath = paths.FirstOrDefault( path => path.Contains( ResolutionDataProcAppendTemplateKeyword ) );
             _resolutionSetupTemplatePath = paths.FirstOrDefault( path => path.Contains( ResolutionSetupTemplateKeyword ) );
         }
 
@@ -70,6 +77,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             var resolutionSizeDatatempText = System.IO.File.ReadAllText( _resolutionSizeDataTemplatePath );
             var resolutionLeveltempText = System.IO.File.ReadAllText( _resolutionLevelTemplatePath );
             var resolutionCategorytempText = System.IO.File.ReadAllText( _resolutionCategoryTemplatePath );
+            var resolutionDataProcAppendtempText = System.IO.File.ReadAllText( _resolutionDataProcAppendTemplatePath );
             var resolutionSetuptempText = System.IO.File.ReadAllText( _resolutionSetupTemplatePath );
 
             var writePaths = new List<string>();
@@ -85,23 +93,26 @@ namespace ADONEGames.ResolutionCalcCache.Editor
                 ResolutionData resolutionData;
                 var levelName = _projectData.ResolutionDataList[i].LevelName;
                 var classNames = new List<string>();
+                var dataClassTexts = new List<string>();
 
                 levelNames.Add( $"        {levelName} = {i}," ); // Enumの定義
 
+                // data
                 resolutionData = _projectData.ResolutionDataList[i];
                 classNames.Add( $"{_projectData.ClassName}{levelName}{resolutionData.ResolutionSizeDataList[0].Orientation}" ); // クラス名
-                DataWrite( _dataPath, _projectData.NamespaceName, classNames.Last(), resolutionData );
+                dataClassTexts.Add( DataText( _dataPath, _projectData.NamespaceName, classNames.Last(), resolutionData ) );
 
+                // data
                 resolutionData = new ResolutionData( levelName, resolutionData.FitDirection == FitDirection.Horizontal ? FitDirection.Vertical : FitDirection.Horizontal );
                 for( var j = 0; j < _projectData.ResolutionCategoryList.Count; j++ )
                 {
-                    resolutionData.SetSize( _projectData.ResolutionCategoryList[j], _projectData.ResolutionDataList[i].ResolutionSizeDataList[j].Height, _projectData.ResolutionDataList[i].ResolutionSizeDataList[j].Width );
+                    resolutionData.SetSize( _projectData.ResolutionCategoryList[j], _projectData.ResolutionDataList[i].ResolutionSizeDataList[j].Height, _projectData.ResolutionDataList[i].ResolutionSizeDataList[j].Width, _projectData.ResolutionDataList[i].ResolutionSizeDataList[j].Depth, _projectData.ResolutionDataList[i].ResolutionSizeDataList[j].Format );
                 }
                 classNames.Add( $"{_projectData.ClassName}{levelName}{resolutionData.ResolutionSizeDataList[0].Orientation}" ); // クラス名
-                DataWrite( _dataPath, _projectData.NamespaceName, classNames.Last(), resolutionData );
+                dataClassTexts.Add( DataText( _dataPath, _projectData.NamespaceName, classNames.Last(), resolutionData ) );
 
-                // Setupの引数
-                setupAppendText.Add( $"            ResolutionDataProc.Append( (int)ResolutionLevel.{resolutionData.LevelName}, new IResolutionData[] {{ new {classNames[0]}(), new {classNames[1]}(), }} );" );
+                // setup
+                setupAppendText.Add( AppendText( dataClassTexts, levelName ) );
             }
             LevelWrite( _dataPath, _projectData.NamespaceName, levelNames );
             CategoryWrite( _dataPath, _projectData.NamespaceName, categoryNames );
@@ -109,50 +120,85 @@ namespace ADONEGames.ResolutionCalcCache.Editor
 
             return (writePaths, true);
 
-            void DataWrite( string dirPath, string namespaceName, string className, ResolutionData data )
+            string DataText( string dirPath, string namespaceName, string className, ResolutionData data )
             {
-                // var sizeText = resolutionSizeDatatempText;
-                var dataText = resolutionDatatempText;
-
-                var newInstanceText = new List<string>();
                 var sizeClassTexts = new List<string>();
                 foreach( var sizeData in data.ResolutionSizeDataList )
                 {
-                    var sizeClassText = resolutionSizeDatatempText;
-
-                    sizeClassText = sizeClassText.Replace( ClassKeyword,       sizeData.CategoryName );
-                    sizeClassText = sizeClassText.Replace( WidthKeyword,       sizeData.Width.ToString() );
-                    sizeClassText = sizeClassText.Replace( HeightKeyword,      sizeData.Height.ToString() );
-                    sizeClassText = sizeClassText.Replace( AspectKeyword,      sizeData.Aspect.ToString("F8") );
-                    sizeClassText = sizeClassText.Replace( OrientationKeyword, sizeData.Orientation.ToString() );
-
-                    sizeClassTexts.Add( sizeClassText );
-
-                    newInstanceText.Add( $"new {sizeData.CategoryName}()," );
+                    sizeClassTexts.Add( SizeDataText( sizeData ) );
                 }
+                
+                var dataText = resolutionDatatempText;
+                dataText = dataText.Replace( SizeDataClassKeyword, string.Join( " ", sizeClassTexts ) );
+                dataText = dataText.Replace( FitDirectionKeyword,  data.FitDirection.ToString() );
 
-                dataText = dataText.Replace( NamespaceKeyword,    namespaceName );
-                dataText = dataText.Replace( ClassKeyword,        className );
-                dataText = dataText.Replace( SizeDataKeyword,     string.Join( " ", newInstanceText ) );
-                dataText = dataText.Replace( SizeDataClassKeyword,string.Join( "\n", sizeClassTexts ) );
-                dataText = dataText.Replace( FitDirectionKeyword, data.FitDirection.ToString() );
+                return dataText;
+
+                // // var sizeText = resolutionSizeDatatempText;
+                // var dataText = resolutionDatatempText;
+
+                // var newInstanceText = new List<string>();
+                // var sizeClassTexts = new List<string>();
+                // foreach( var sizeData in data.ResolutionSizeDataList )
+                // {
+                //     var sizeClassText = resolutionSizeDatatempText;
+
+                //     sizeClassText = sizeClassText.Replace( ClassKeyword,       sizeData.CategoryName );
+                //     sizeClassText = sizeClassText.Replace( WidthKeyword,       sizeData.Width.ToString() );
+                //     sizeClassText = sizeClassText.Replace( HeightKeyword,      sizeData.Height.ToString() );
+                //     sizeClassText = sizeClassText.Replace( AspectKeyword,      sizeData.Aspect.ToString("F8") );
+                //     sizeClassText = sizeClassText.Replace( OrientationKeyword, sizeData.Orientation.ToString() );
+
+                //     sizeClassTexts.Add( sizeClassText );
+
+                //     newInstanceText.Add( $"new {sizeData.CategoryName}()," );
+                // }
+
+                // dataText = dataText.Replace( NamespaceKeyword,    namespaceName );
+                // dataText = dataText.Replace( ClassKeyword,        className );
+                // dataText = dataText.Replace( SizeDataKeyword,     string.Join( " ", newInstanceText ) );
+                // dataText = dataText.Replace( SizeDataClassKeyword,string.Join( "\n", sizeClassTexts ) );
+                // dataText = dataText.Replace( FitDirectionKeyword, data.FitDirection.ToString() );
 
 
-                // var text = resolutionDatatempText;
+                // // var text = resolutionDatatempText;
 
-                // text = text.Replace( NamespaceKeyword, namespaceName );
-                // text = text.Replace( ClassKeyword,     className );
-                // // text = text.Replace( WidthKeyword,     data.CanvasWidth.ToString() );
-                // // text = text.Replace( HeightKeyword,    data.CanvasHeight.ToString() );
-                // // text = text.Replace( AspectKeyword,    $"{data.Aspect}f" );
-                // // text = text.Replace( OrientationKeyword, data.Orientation.ToString() );
-                // text = text.Replace( FitDirectionKeyword, data.FitDirection.ToString() );
+                // // text = text.Replace( NamespaceKeyword, namespaceName );
+                // // text = text.Replace( ClassKeyword,     className );
+                // // // text = text.Replace( WidthKeyword,     data.CanvasWidth.ToString() );
+                // // // text = text.Replace( HeightKeyword,    data.CanvasHeight.ToString() );
+                // // // text = text.Replace( AspectKeyword,    $"{data.Aspect}f" );
+                // // // text = text.Replace( OrientationKeyword, data.Orientation.ToString() );
+                // // text = text.Replace( FitDirectionKeyword, data.FitDirection.ToString() );
 
-                var writePath = $"{dirPath}/{className}.cs";
-                System.IO.File.WriteAllText( writePath, dataText );
+                // var writePath = $"{dirPath}/{className}.cs";
+                // System.IO.File.WriteAllText( writePath, dataText );
 
-                writePaths.Add( writePath );
+                // writePaths.Add( writePath );
             }
+            string SizeDataText( ResolutionSizeData data )
+            {
+                var sizeText = resolutionSizeDatatempText;
+
+                sizeText = sizeText.Replace( WidthKeyword,       data.Width.ToString() );
+                sizeText = sizeText.Replace( HeightKeyword,      data.Height.ToString() );
+                sizeText = sizeText.Replace( AspectKeyword,      data.Aspect.ToString("F8") );
+                sizeText = sizeText.Replace( DepthKeyword,       data.Depth.ToString() );
+                sizeText = sizeText.Replace( TextureFormatKeyword,      data.Format.ToString() );
+                sizeText = sizeText.Replace( OrientationKeyword, data.Orientation.ToString() );
+
+                return sizeText;
+            }
+
+            string AppendText( List<string> dataClassTexts, string levelName )
+            {
+                var appendText = resolutionDataProcAppendtempText;
+                appendText = appendText.Replace( LevelKeyword, levelName );
+                appendText = appendText.Replace( DataClassKeyword, string.Join( "\n", dataClassTexts ) );
+
+                return appendText;
+            }
+
             void LevelWrite( string dirPath, string namespaceName, List<string> levelNames )
             {
                 var text = resolutionLeveltempText;

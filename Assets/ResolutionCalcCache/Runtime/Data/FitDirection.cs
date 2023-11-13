@@ -1,7 +1,7 @@
 namespace ADONEGames.ResolutionCalcCache
 {
     /// <summary>
-    /// Enumerates the fit directions.
+    /// Enumerates the fit directions
     /// </summary>
     /// <remarks>
     /// 合わせる方向を表す列挙型
@@ -9,7 +9,7 @@ namespace ADONEGames.ResolutionCalcCache
     public enum FitDirection
     {
         /// <summary>
-        /// Fit to Horizontal.
+        /// Fit to Horizontal
         /// </summary>
         /// <remarks>
         /// 横に合わせる
@@ -17,7 +17,7 @@ namespace ADONEGames.ResolutionCalcCache
         Horizontal,
         
         /// <summary>
-        /// Fit to Vertical.
+        /// Fit to Vertical
         /// </summary>
         /// <remarks>
         /// 縦に合わせる

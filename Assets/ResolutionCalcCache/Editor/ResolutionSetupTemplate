@@ -4,13 +4,17 @@
 ///////////////////////////////////////////////////////////////////////////////////////////
 using ADONEGames.ResolutionCalcCache;
 
+using UnityEngine;
+
+using ScreenOrientation = ADONEGames.ResolutionCalcCache.ScreenOrientation;
+
 namespace #NAMESPACE#
 {
     /// <summary>
-    /// This static class provides a method to set up the resolution data for the game.
+    /// This static class provides a method to set up the resolution data for the game
     /// </summary>
     /// <remarks>
-    /// この静的クラスは、ゲームの解像度データをセットアップするためのメソッドを提供します。
+    /// ゲームの解像度データをセットアップするためのメソッド
     /// </remarks>
     public static class ResolutionSetup
     {

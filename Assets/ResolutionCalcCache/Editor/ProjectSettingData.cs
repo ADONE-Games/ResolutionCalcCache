@@ -318,13 +318,13 @@ namespace ADONEGames.ResolutionCalcCache.Editor
                             {
                                 var activeData = ResolutionDataList[_resolutionDataEditList.ActiveIndex];
                                 var activeCategory = ResolutionCategoryList[_resolutionCategoryEditList.ActiveIndex];
-                                var (width, height, aspect, orientation, fitDirection) = ViewGUILayout( activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Width, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Height, activeData.FitDirection );
+                                var (width, height, aspect, depth, format, orientation, fitDirection) = ViewGUILayout( activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Width, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Height, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Depth, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Format, activeData.FitDirection );
 
                                 if( check.changed )
                                 {
                                     Undo.RecordObject( this, "SetResolutionData" );
 
-                                    activeData.SetSize( activeCategory, width, height );
+                                    activeData.SetSize( activeCategory, width, height, depth, format );
                                     activeData.SetFitDirection( fitDirection );
                                     EditorUtility.SetDirty( this );
                                 }
@@ -334,7 +334,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
                                 using( new EditorGUILayout.VerticalScope( "helpBox" ) )
                                 {
                                     EditorGUILayout.Space( 30 );
-                                    ViewGUILayout( activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Height, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Width, activeData.FitDirection == FitDirection.Horizontal ? FitDirection.Vertical : FitDirection.Horizontal );
+                                    ViewGUILayout( activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Height, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Width, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Depth, activeData.ResolutionSizeDataList[_resolutionCategoryEditList.ActiveIndex].Format, activeData.FitDirection == FitDirection.Horizontal ? FitDirection.Vertical : FitDirection.Horizontal );
                                     EditorGUILayout.Space( 10 );
                                 }
                             }
@@ -349,7 +349,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
         }
 
 
-        private ( int width, int height, float aspect, ScreenOrientation orientation, FitDirection fitDirection ) ViewGUILayout( int width, int height, FitDirection fitDirection )
+        private ( int width, int height, float aspect, int depth, RenderTextureFormat format, ScreenOrientation orientation, FitDirection fitDirection ) ViewGUILayout( int width, int height, int depth, RenderTextureFormat format, FitDirection fitDirection )
         {
             var result = Editor.ResolutionSizeData.SizeCalculation( width, height );
 
@@ -377,6 +377,16 @@ namespace ADONEGames.ResolutionCalcCache.Editor
                 GUILayout.FlexibleSpace();
                 result.height = EditorGUILayout.IntField( "Height", result.height, GUILayout.Width( 500 ) );
             }
+            using( new EditorGUILayout.HorizontalScope() )
+            {
+                GUILayout.FlexibleSpace();
+                depth = EditorGUILayout.IntPopup( depth, new[] { "0", "16", "24" }, new[] { 0, 16, 24 }, GUILayout.Width( 50 ) );
+            }
+            using( new EditorGUILayout.HorizontalScope() )
+            {
+                GUILayout.FlexibleSpace();
+                format = (RenderTextureFormat)EditorGUILayout.EnumPopup( format, GUILayout.Width( 100 ) );
+            }
 
             using( new EditorGUI.DisabledGroupScope( true ) )
             using( new EditorGUILayout.HorizontalScope() )
@@ -395,7 +405,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             }
 
 
-            return ( result.width, result.height, result.aspect, result.orientation, fitDirection );
+            return ( result.width, result.height, result.aspect, depth, format, result.orientation, fitDirection );
         }
 
         private ResolutionDataEditList GetResolutionDataEditList()
@@ -404,7 +414,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             {
                 SeveObject = this,
                 ResolutionDataList = ResolutionDataList,
-                AddItem = () => new ResolutionData( ResolutionCategoryList ,1080, 1920 )
+                AddItem = () => new ResolutionData( ResolutionCategoryList ,1080, 1920, 0, RenderTextureFormat.ARGB32 )
             };
         }
 
@@ -418,7 +428,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
                     categoryList.Add( string.Empty );
                     foreach( var data in ResolutionDataList )
                     {
-                        data.SetSize( string.Empty, 1080, 1020 );
+                        data.SetSize( string.Empty, 1080, 1020, 0, RenderTextureFormat.ARGB32 );
                     }
                 },
                 RemoveItem = activeIndex => {
@@ -485,15 +495,15 @@ namespace ADONEGames.ResolutionCalcCache.Editor
 
         public FitDirection FitDirection;
 
-        public ResolutionData( string categoryName, int width, int height )
+        public ResolutionData( string categoryName, int width, int height, int depth, RenderTextureFormat format )
         {
-            SetSize( categoryName, width, height );
+            SetSize( categoryName, width, height, depth, format );
         }
-        public ResolutionData( List<string> categoryNames, int width, int height )
+        public ResolutionData( List<string> categoryNames, int width, int height, int depth, RenderTextureFormat format )
         {
             foreach( var categoryName in categoryNames )
             {
-                SetSize( categoryName, width, height );
+                SetSize( categoryName, width, height, depth, format );
             }
         }
 
@@ -507,7 +517,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             ResolutionSizeDataList[ index ].SetCategoryName( categoryName );
         }
 
-        public void SetSize( string categoryName, int width, int height )
+        public void SetSize( string categoryName, int width, int height, int depth, RenderTextureFormat format )
         {
             ResolutionSizeDataList ??= new List<ResolutionSizeData>();
 
@@ -516,13 +526,13 @@ namespace ADONEGames.ResolutionCalcCache.Editor
                 if( !ResolutionSizeDataList[ i ].CategoryName.Equals( categoryName ) )
                     continue;
 
-                ResolutionSizeDataList[ i ].SetSize( width, height );
+                ResolutionSizeDataList[ i ].SetSize( width, height, depth, format );
                 return;
             }
 
             if( !ResolutionSizeDataList.Any( data => data.CategoryName == categoryName ) )
             {
-                ResolutionSizeDataList.Add( new ResolutionSizeData( categoryName, width, height ) );
+                ResolutionSizeDataList.Add( new ResolutionSizeData( categoryName, width, height, depth, format ) );
             }
         }
 
@@ -560,12 +570,16 @@ namespace ADONEGames.ResolutionCalcCache.Editor
         public int Height;
 
         [NonSerialized]
+        public float Aspect;
+
+        public int Depth;
+
+        public RenderTextureFormat Format;
+
+        [NonSerialized]
         public float WidthAspectProportional;
         [NonSerialized]
         public float HeightAspectProportional;
-
-        [NonSerialized]
-        public float Aspect;
 
         [NonSerialized]
         public ScreenOrientation Orientation;
@@ -576,27 +590,33 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             CategoryName = categoryName;
         }
 
-        public ResolutionSizeData( string categoryName, int width, int height )
+        public ResolutionSizeData( string categoryName, int width, int height, int depth, RenderTextureFormat format )
         {
-            SetSize( categoryName, width, height );
+            SetSize( categoryName, width, height, depth, format );
         }
 
         public void SetCategoryName( string categoryName )
         {
             CategoryName = categoryName;
         }
+        public void SetRenderTextureFormat( RenderTextureFormat format )
+        {
+            Format = format;
+        }
 
-        public void SetSize( string categoryName, int width, int height )
+        public void SetSize( string categoryName, int width, int height, int depth, RenderTextureFormat format )
         {
             SetCategoryName( categoryName );
-            SetSize( width, height );
+            SetSize( width, height, depth, format );
         }
-        public void SetSize( int width, int height )
+        public void SetSize( int width, int height, int depth, RenderTextureFormat format )
         {
             var result = SizeCalculation( width, height );
 
             Width = result.width;
             Height = result.height;
+            Depth = depth;
+            SetRenderTextureFormat( format );
 
             WidthAspectProportional = result.widthAspectProportional;
             HeightAspectProportional = result.heightAspectProportional;
@@ -608,7 +628,7 @@ namespace ADONEGames.ResolutionCalcCache.Editor
 
         public void SetSize()
         {
-            SetSize( Width, Height );
+            SetSize( Width, Height, Depth, Format );
         }
 
         public static ( int width, int height, float aspect, float widthAspectProportional, float heightAspectProportional, ScreenOrientation orientation ) SizeCalculation( int width, int height )
