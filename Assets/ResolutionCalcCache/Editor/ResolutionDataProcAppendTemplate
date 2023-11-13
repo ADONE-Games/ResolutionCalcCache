@@ -1,0 +1,5 @@
+            ResolutionDataProc.Append(
+                (int)ResolutionLevel.#LEVEL#,
+                new[] {
+#DATACLASS#
+                } );

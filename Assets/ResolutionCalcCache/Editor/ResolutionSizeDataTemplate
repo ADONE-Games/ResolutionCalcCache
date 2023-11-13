@@ -1,15 +1,1 @@
-        /// <inheritdoc cref="IResolutionSizeData"/>
-        private struct #CLASS# : IResolutionSizeData
-        {
-            /// <inheritdoc /> 
-            readonly int IResolutionSizeData.Width => #WIDTH#;
-
-            /// <inheritdoc />
-            readonly int IResolutionSizeData.Height => #HEIGHT#;
-
-            /// <inheritdoc />
-            readonly float IResolutionSizeData.Aspect => #ASPCT#f;
-
-            /// <inheritdoc />
-            readonly ScreenOrientation IResolutionSizeData.Orientation => ScreenOrientation.#Orientation#;
-        }
+new ResolutionSizeData( #WIDTH#, #HEIGHT#, #ASPCT#f, #DEPTH#, RenderTextureFormat.#TEXTUREFORMAT#, ScreenOrientation.#ORIENTATION# ),

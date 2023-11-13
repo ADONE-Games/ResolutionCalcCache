@@ -1,7 +1,7 @@
 namespace ADONEGames.ResolutionCalcCache
 {
     /// <summary>
-    /// Enumerates the screen orientations.
+    /// Enumerates the screen orientations
     /// </summary>
     /// <remarks>
     /// 画面の向きを表す列挙型
@@ -9,7 +9,7 @@ namespace ADONEGames.ResolutionCalcCache
     public enum ScreenOrientation
     {
         /// <summary>
-        /// Portrait orientation.
+        /// Portrait orientation
         /// </summary>
         /// <remarks>
         /// 縦向き
@@ -17,7 +17,7 @@ namespace ADONEGames.ResolutionCalcCache
         Portrait,
         
         /// <summary>
-        /// Landscape orientation.
+        /// Landscape orientation
         /// </summary>
         /// <remarks>
         /// 横向き

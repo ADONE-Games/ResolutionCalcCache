@@ -10,13 +10,14 @@ namespace ADONEGames.ResolutionCalcCache
         /// <remarks>
         /// Instanceの生成 & 初期化
         /// </remarks>
-        /// <returns>生成されたInstance</returns>
-        private static ResolutionDataProc CreateInstance( IResolutionData[] resolutionDatas )
+        /// <param name="resolutionDatas">Resolution data</param>
+        /// <returns>ResolutionDataProc Instance</returns>
+        private static ResolutionDataProc CreateInstance( ResolutionData[] resolutionDatas )
         {
             var resolutionDataProcs = new ResolutionData[ resolutionDatas.Length ];
             for( var i = 0; i < resolutionDatas.Length; i++ )
             {
-                // resolutionDataProcs[ i ] = new ResolutionData { Width = resolutionDatas[ i ].Width, Height = resolutionDatas[ i ].Height, Aspect = resolutionDatas[ i ].Aspect, Orientation = resolutionDatas[ i ].Orientation };
+                resolutionDataProcs[ i ] = resolutionDatas[ i ].Recalculate();
             }
 
             var instance = new ResolutionDataProc( resolutionDataProcs );
@@ -26,31 +27,14 @@ namespace ADONEGames.ResolutionCalcCache
         }
 
         /// <summary>
-        /// Switches the instance.
-        /// </summary>
-        /// <remarks>
-        /// Instanceの切り替え
-        /// </remarks>
-        public static void SwitchResolution( int levelIndex )
-        {
-            if( !ResolutionDataProcLocator.TryGetValue( levelIndex, out var instance ) ) return;
-
-            Instance = instance;
-        }
-
-        /// <inheritdoc cref="SwitchResolution(int)"/>
-        public static void SwitchResolution( Enum levelIndex )
-        {
-            SwitchResolution( Convert.ToInt32( levelIndex ) );
-        }
-
-        /// <summary>
         /// Generates an instance and registers it to the locator.
         /// </summary>
         /// <remarks>
         /// Instanceの生成とLocatorへの登録
         /// </remarks>
-        public static void Append( int levelIndex, IResolutionData[] resolutionDatas )
+        /// <param name="levelIndex">Level index</param>
+        /// <param name="resolutionDatas">Resolution data</param>
+        public static void Append( int levelIndex, ResolutionData[] resolutionDatas )
         {
             if( ResolutionDataProcLocator.ContainsKey( levelIndex ) )
             {
@@ -73,7 +57,9 @@ namespace ADONEGames.ResolutionCalcCache
         }
 
         /// <inheritdoc cref="Append(int, IResolutionData[])"/>
-        public static void Append( Enum levelIndex, IResolutionData[] resolutionDatas )
+        /// <param name="levelIndex">Level index</param>
+        /// <param name="resolutionDatas">Resolution data</param>
+        public static void Append( Enum levelIndex, ResolutionData[] resolutionDatas )
         {
             Append( Convert.ToInt32( levelIndex ), resolutionDatas );
         }
