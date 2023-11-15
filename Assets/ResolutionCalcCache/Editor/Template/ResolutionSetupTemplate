@@ -6,6 +6,7 @@ using ADONEGames.ResolutionCalcCache;
 
 using UnityEngine;
 
+
 using ScreenOrientation = ADONEGames.ResolutionCalcCache.ScreenOrientation;
 
 namespace #NAMESPACE#
