@@ -1,11 +1,9 @@
-// using System.IO;
-
-using System.Collections.Generic;
 using System.Text;
 
 using UnityEditor;
 
 using UnityEngine;
+
 
 namespace ADONEGames.ResolutionCalcCache.Editor
 {
@@ -94,6 +92,29 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             // EditorGUILayout.LabelField( $"Screen.width: {Screen.width}, Screen.height: {Screen.height}" );
             // EditorGUILayout.LabelField( $"Screen.mainWindowDisplayInfo.width: {Screen.mainWindowDisplayInfo.width}, Screen.mainWindowDisplayInfo.height: {Screen.mainWindowDisplayInfo.height}" );
 
+            // var typeResult = false;
+            // foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+            // {
+            //     foreach( var type in assembly.GetTypes() )
+            //     {
+            //         if( !type.Name.Equals( "ResolutionCategory" ) )
+            //             continue;
+
+            //         typeResult = true;
+            //         break;
+            //     }
+            //     if( typeResult )
+            //         break;
+            // }
+            // if( typeResult )
+            // {
+            //     EditorGUILayout.LabelField( $"ResolutionCategory: {typeResult}" );
+            // }
+            // else
+            // {
+            //     EditorGUILayout.LabelField( $"ResolutionCategory: null" );
+            // }
+
         }
 
         /// <summary>
@@ -110,92 +131,6 @@ namespace ADONEGames.ResolutionCalcCache.Editor
             provider.keywords = provider._projectSettingKeywords;
 
             return provider;
-        }
-    }
-
-
-    internal class ResolutionCalcCacheSystemData
-    {
-        private const string AssetPath = "../ProjectSettings/ResolutionCalcCacheSystemData.asset";
-
-        public List<string> ResolutionDataTyepNames = new();
-        
-        public static ResolutionCalcCacheSystemData Create()
-        {
-            var instance = new ResolutionCalcCacheSystemData();
-            instance.GetSearchType();
-            return instance;
-        }
-
-        public void GetSearchType()
-        {
-            ResolutionDataTyepNames ??= new List<string>();
-
-            {
-                // 仮リスト
-                ResolutionDataTyepNames.Add( "aaa" );
-                ResolutionDataTyepNames.Add( "bbb" );
-                return;
-            }
-
-            var assembly = typeof( ResolutionCalcCacheSystemData ).Assembly; // 仮
-            var types    = assembly.GetTypes();
-
-            foreach( var type in types )
-            {
-                if( !type.IsValueType ) continue;
-                if( !type.IsEnum ) continue;
-
-                ResolutionDataTyepNames.Add( type.Name );
-            }
-        }
-    }
-
-    // [assembly: Dependency(typeof(ResolutionCalcCacheSystemData))]
-    internal class ResolutionCalcCacheSystemDataEditor : ScriptableObject
-    {
-        [SerializeField]
-        private ResolutionCalcCacheSystemData _systemData;
-        
-        [SerializeField]
-        private int _systemDataSelectIndex;
-        
-
-        private GUIContent _refreshIconContent;
-
-        public void OnGUI()
-        {
-            _systemData ??= ResolutionCalcCacheSystemData.Create();
-
-            _refreshIconContent ??= EditorGUIUtility.IconContent( "d_Refresh" );
-
-            using( var check = new EditorGUI.ChangeCheckScope() )
-            using( new EditorGUILayout.HorizontalScope( "box" ) )
-            {
-                EditorGUILayout.LabelField( "Edit ResolutionType" );
-                var selectIndex = EditorGUILayout.Popup( _systemDataSelectIndex, _systemData.ResolutionDataTyepNames.ToArray() );
-                if( check.changed )
-                {
-                    Undo.RecordObject( this, "Change ResolutionCalcCache-SystemDataIndex" );
-                    _systemDataSelectIndex = selectIndex;
-
-                    // EditorUtility.SetDirty( this );
-                }
-
-                if( GUILayout.Button( new GUIContent( "", _refreshIconContent.image ), GUILayout.Width( 20 ), GUILayout.Height( 20 ) ) )
-                {
-                    _systemData.GetSearchType();
-                }
-            }
-        }
-
-        public static ResolutionCalcCacheSystemDataEditor Create()
-        {
-            var instance = CreateInstance<ResolutionCalcCacheSystemDataEditor>();
-            instance._systemData = ResolutionCalcCacheSystemData.Create();
-            instance.hideFlags |= HideFlags.HideAndDontSave;
-
-            return instance;
         }
     }
 }
