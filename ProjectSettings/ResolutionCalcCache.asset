@@ -1,0 +1,120 @@
+﻿{
+    "ResolutionDataFolderGUID": "17ac9461f29574d99b04471ff13c069f",
+    "ResolutionDataList": [
+        {
+            "LevelName": "Lowest",
+            "ResolutionSizeDataList": [
+                {
+                    "CategoryName": "Base",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 0,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "InGame",
+                    "Width": 360,
+                    "Height": 640,
+                    "Depth": 16,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "OutGame",
+                    "Width": 720,
+                    "Height": 1280,
+                    "Depth": 0,
+                    "Format": 0
+                }
+            ],
+            "FitDirection": 0
+        },
+        {
+            "LevelName": "Normal",
+            "ResolutionSizeDataList": [
+                {
+                    "CategoryName": "Base",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 0,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "InGame",
+                    "Width": 540,
+                    "Height": 960,
+                    "Depth": 16,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "OutGame",
+                    "Width": 900,
+                    "Height": 1600,
+                    "Depth": 0,
+                    "Format": 0
+                }
+            ],
+            "FitDirection": 0
+        },
+        {
+            "LevelName": "High",
+            "ResolutionSizeDataList": [
+                {
+                    "CategoryName": "Base",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 0,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "InGame",
+                    "Width": 720,
+                    "Height": 1280,
+                    "Depth": 16,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "OutGame",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 0,
+                    "Format": 0
+                }
+            ],
+            "FitDirection": 0
+        },
+        {
+            "LevelName": "Highest",
+            "ResolutionSizeDataList": [
+                {
+                    "CategoryName": "Base",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 0,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "InGame",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 16,
+                    "Format": 0
+                },
+                {
+                    "CategoryName": "OutGame",
+                    "Width": 1080,
+                    "Height": 1920,
+                    "Depth": 0,
+                    "Format": 0
+                }
+            ],
+            "FitDirection": 0
+        }
+    ],
+    "CategoryList": [
+        "Base",
+        "InGame",
+        "OutGame"
+    ],
+    "NamespaceName": "ProjectOrigin",
+    "ClassName": "ResolutionData"
+}

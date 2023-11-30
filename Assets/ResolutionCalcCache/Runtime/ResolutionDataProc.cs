@@ -42,6 +42,16 @@ namespace ADONEGames.ResolutionCalcCache
         /// </remarks>
         private static readonly Dictionary<int, RenderTexture> RenderTextureCache = new();
 
+        // private static readonly Dictionary<int, AutoResolutionInCameraRTexSetter> CameraCache = new();
+
+        private static readonly Dictionary<int, IResolutionLevelChangeObserver> ResolutionLevelChangeObservers = new();
+
+        // private static readonly Dictionary<int, IResolutionRTexSetter> ResolutionRTexSetterCaches = new();
+        // private static readonly Dictionary<int, IResolutionRTexViewObjectGetter> ResolutionRTexViewObjectGetters = new();
+        // private static readonly Dictionary<int, IResolutionRTexViewObjectGetterAddedObserver> ResolutionRTexViewObjectGetterAddedObservers = new();
+
+
+
         /// <summary>
         /// Platform screen width
         /// </summary>
@@ -144,6 +154,11 @@ namespace ADONEGames.ResolutionCalcCache
             _resolutionDatas.Clear();
         }
 
+        public static void TryGetResolutionData( out ResolutionData resolutionData )
+        {
+            Instance._resolutionDatas.TryGetValue( PlatformScreenOrientation, out resolutionData );
+        }
+
         /// <summary>
         /// Switches the instance.
         /// </summary>
@@ -156,6 +171,10 @@ namespace ADONEGames.ResolutionCalcCache
             if( !ResolutionDataProcLocator.TryGetValue( levelIndex, out var instance ) ) return;
 
             Instance = instance;
+
+            SetResolution();
+
+            OnLevelChangeNotification();
         }
 
         /// <inheritdoc cref="SwitchResolution(int)"/>
@@ -163,6 +182,32 @@ namespace ADONEGames.ResolutionCalcCache
         public static void SwitchResolution( Enum level )
         {
             SwitchResolution( Convert.ToInt32( level ) );
+        }
+
+        /// <summary>
+        /// Sets the resolution.
+        /// </summary>
+        /// <remarks>
+        /// 解像度を設定する
+        /// </remarks>
+        public static void SetResolution()
+        {
+            var baseResolutionData = Instance._resolutionDatas[PlatformScreenOrientation].ResolutionSizeDatas[0];
+            Screen.SetResolution( baseResolutionData.Width, baseResolutionData.Height, Screen.fullScreen );
+        }
+
+        /// <summary>
+        /// Notifies all the resolution level change observers when the level changes.
+        /// </summary>
+        /// <remarks>
+        /// レベルが変更されたときに、すべての解像度レベル変更オブザーバーに通知する
+        /// </remarks>
+        private static void OnLevelChangeNotification()
+        {
+            foreach( var (_, levelChangeNotification) in ResolutionLevelChangeObservers )
+            {
+                levelChangeNotification.OnLevelChange();
+            }
         }
 
         /// <summary>
@@ -229,7 +274,7 @@ namespace ADONEGames.ResolutionCalcCache
 
             var resolutionSizeData = resolutionData.ResolutionSizeDatas[categoryIndex];
 
-            return RenderTexture.GetTemporary( resolutionSizeData.Width, resolutionSizeData.Height );
+            return RenderTexture.GetTemporary( resolutionSizeData.Width, resolutionSizeData.Height, resolutionSizeData.Depth, resolutionSizeData.TextureFormat );
         }
 
         /// <summary>
@@ -251,9 +296,57 @@ namespace ADONEGames.ResolutionCalcCache
 
         /// <inheritdoc cref="GetRenderTexture(int)"/>
         /// <param name="category">The category.</param>
-        public static (int cacheId, RenderTexture renderTexture) GetRenderTexture( Enum category )
+        public static (int cacheId, RenderTexture renderTexture) GetRenderTexture( Enum category ) => GetRenderTexture( Convert.ToInt32( category ) );
+
+
+        public static void SetObject( object obj )
         {
-            return GetRenderTexture( Convert.ToInt32( category ) );
+            if( obj is IResolutionLevelChangeObserver levelChangeObserver )
+                ResolutionLevelChangeObservers.Add( levelChangeObserver.Guid, levelChangeObserver );
         }
+
+        public static void RemoveObject( int resolutionGuid )
+        {
+            if( ResolutionLevelChangeObservers.ContainsKey( resolutionGuid ) )
+                ResolutionLevelChangeObservers.Remove( resolutionGuid );
+        }
+
+        // public static int SetCamera( int categoryIndex, AutoResolutionInCameraRTexSetter autoResolutionInCameraRTexSetter )
+        // {
+        //     var renderTexture = GetRenderTexture( categoryIndex );
+        //     CameraCache.Add( renderTexture.cacheId, autoResolutionInCameraRTexSetter );
+        //     camera.targetTexture = renderTexture.renderTexture;
+
+        //     return renderTexture.cacheId;
+        // }
+
+        // public static void SetCamera( Enum category, Camera camera ) => SetCamera( Convert.ToInt32( category ), camera );
+
+
+        // public static void RemoveCamera( int cacheId )
+        // {
+        //     if( !CameraCache.TryGetValue( cacheId, out var camera ) )
+        //         return;
+
+        //     camera.targetTexture = null;
+        //     CameraCache.Remove( cacheId );
+
+        //     ReleaseRenderTextureCache( cacheId );
+        // }
+
+        // public static void RemoveCamera( Enum category ) => RemoveCamera( Convert.ToInt32( category ) );
+
+
+        // public static void RemoveCamera( Camera camera )
+        // {
+        //     foreach( var (cacheId, cam) in CameraCache )
+        //     {
+        //         if( cam != camera )
+        //             continue;
+
+        //         RemoveCamera( cacheId );
+        //         break;
+        //     }
+        // }
     }
 }
