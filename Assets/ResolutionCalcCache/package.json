@@ -2,7 +2,7 @@
  "name": "games.adone.resolution-calc-cache",
   "displayName": "Resolution Calc Cache",
   "version": "0.1.0",
-  "unity": "2020.3",
+  "unity": "2021.3",
   "description": "設定した解像度になるように各種ディスプレイに合わせた解像度調整を行う。\n結果は参照できるように保持する。",
   "license": "MIT",
   "dependencies": {}
