@@ -92,12 +92,12 @@ namespace ADONEGames.ResolutionCalcCache
                 if( fitDirection == FitDirection.Horizontal )
                 {
                     // 横フィット
-                    return new ResolutionSizeData( Width, Mathf.RoundToInt( Width / platformAspect ), Aspect, Depth, TextureFormat, Orientation ); // 1080x2340
+                    return new ResolutionSizeData( Width, Mathf.CeilToInt( Width / platformAspect ), Aspect, Depth, TextureFormat, Orientation ); // 1080x2340
                 }
                 else
                 {
                     // 縦フィット
-                    return new ResolutionSizeData( Mathf.RoundToInt( Height * platformAspect ), Height, Aspect, Depth, TextureFormat, Orientation ); // 886x1920
+                    return new ResolutionSizeData( Mathf.CeilToInt( Height * platformAspect ), Height, Aspect, Depth, TextureFormat, Orientation ); // 886x1920
                 }
             }
             else
@@ -107,12 +107,12 @@ namespace ADONEGames.ResolutionCalcCache
                 if( fitDirection == FitDirection.Horizontal )
                 {
                     // 横フィット
-                    return new ResolutionSizeData( Mathf.RoundToInt( Height * platformAspect ), Height, Aspect, Depth, TextureFormat, Orientation ); // 2340x1080
+                    return new ResolutionSizeData( Mathf.CeilToInt( Height * platformAspect ), Height, Aspect, Depth, TextureFormat, Orientation ); // 2340x1080
                 }
                 else
                 {
                     // 縦フィット
-                    return new ResolutionSizeData( Width, Mathf.RoundToInt( Width / platformAspect ), Aspect, Depth, TextureFormat, Orientation ); // 1920x886
+                    return new ResolutionSizeData( Width, Mathf.CeilToInt( Width / platformAspect ), Aspect, Depth, TextureFormat, Orientation ); // 1920x886
                 }
             }
         }
